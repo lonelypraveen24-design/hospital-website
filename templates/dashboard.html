@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard – MediCarePlus</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family: 'DM Sans', sans-serif; background: #0D1117; color: #E6EDF3; min-height: 100vh; }
+    .navbar { display:flex; align-items:center; justify-content:space-between; padding:1rem 5%; background:#161B22; border-bottom:1px solid rgba(255,255,255,0.08); }
+    .brand { font-family:'Syne',sans-serif; font-size:1.4rem; font-weight:800; }
+    .brand em { color:#FF6B6B; font-style:normal; }
+    .nav-right { display:flex; align-items:center; gap:1rem; }
+    .user-badge { background:#21262D; border:1px solid rgba(255,255,255,0.1); padding:0.4rem 1rem; border-radius:50px; font-size:0.9rem; }
+    .logout { color:#FF6B6B; text-decoration:none; font-weight:600; font-size:0.9rem; }
+    .main { padding:3rem 5%; max-width:1100px; margin:0 auto; }
+    h1 { font-family:'Syne',sans-serif; font-size:2rem; font-weight:800; margin-bottom:0.5rem; }
+    .welcome-sub { color:#8B949E; margin-bottom:2.5rem; }
+    .cards-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:1.5rem; margin-bottom:3rem; }
+    .stat-card { background:#161B22; border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:1.5rem; }
+    .stat-card .num { font-family:'Syne',sans-serif; font-size:2rem; font-weight:800; color:#FF6B6B; }
+    .stat-card .lbl { color:#8B949E; font-size:0.9rem; margin-top:0.3rem; }
+    h2 { font-family:'Syne',sans-serif; font-size:1.3rem; font-weight:700; margin-bottom:1rem; }
+    .table-wrap { background:#161B22; border:1px solid rgba(255,255,255,0.08); border-radius:16px; overflow:hidden; }
+    table { width:100%; border-collapse:collapse; }
+    th { background:#21262D; padding:1rem 1.2rem; text-align:left; font-size:0.85rem; color:#8B949E; font-weight:600; }
+    td { padding:1rem 1.2rem; border-top:1px solid rgba(255,255,255,0.06); font-size:0.9rem; }
+    .badge { display:inline-block; padding:0.25rem 0.8rem; border-radius:50px; font-size:0.78rem; font-weight:600; }
+    .badge.pending { background:rgba(255,230,109,0.15); color:#FFE66D; }
+    .badge.confirmed { background:rgba(78,205,196,0.15); color:#4ECDC4; }
+    .badge.completed { background:rgba(85,239,196,0.15); color:#55EFC4; }
+    .badge.cancelled { background:rgba(255,107,107,0.15); color:#FF6B6B; }
+    .empty { text-align:center; padding:3rem; color:#8B949E; }
+    .btn-book { display:inline-block; background:linear-gradient(135deg,#FF6B6B,#FF8E53); color:#fff; padding:0.7rem 1.5rem; border-radius:50px; font-weight:700; text-decoration:none; margin-bottom:2rem; }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="brand">✚ Medicare<em>Plus</em></div>
+    <div class="nav-right">
+      <span class="user-badge">👤 {{ user.username }}</span>
+      <a href="/logout/" class="logout">Logout</a>
+    </div>
+  </nav>
+
+  <div class="main">
+    <h1>Welcome, {{ user.first_name|default:user.username }}! 👋</h1>
+    <p class="welcome-sub">Manage your appointments and health records here.</p>
+
+    <div class="cards-row">
+      <div class="stat-card">
+        <div class="num">{{ appointments.count }}</div>
+        <div class="lbl">Total Appointments</div>
+      </div>
+      <div class="stat-card">
+        <div class="num" style="color:#4ECDC4">{{ appointments|length }}</div>
+        <div class="lbl">This Month</div>
+      </div>
+      <div class="stat-card">
+        <div class="num" style="color:#A29BFE">24/7</div>
+        <div class="lbl">Emergency Support</div>
+      </div>
+    </div>
+
+    <a href="/#contact" class="btn-book">+ Book New Appointment</a>
+
+    <h2>Your Appointments</h2>
+    <div class="table-wrap">
+      {% if appointments %}
+      <table>
+        <thead>
+          <tr>
+            <th>Department</th>
+            <th>Message</th>
+            <th>Status</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for appt in appointments %}
+          <tr>
+            <td>{{ appt.department }}</td>
+            <td>{{ appt.message|truncatechars:50 }}</td>
+            <td><span class="badge {{ appt.status }}">{{ appt.status|capfirst }}</span></td>
+            <td>{{ appt.created_at|date:"d M Y" }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="empty">
+        <p>🗓️ No appointments yet.</p>
+        <p style="margin-top:0.5rem; font-size:0.9rem;">Book your first appointment above!</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</body>
+</html>
